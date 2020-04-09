@@ -159,3 +159,15 @@ This project is licensed under the [MIT license](http://opensource.org/licenses/
 Special thanks to all the contributions thus far!
 
 For a full list see: https://github.com/fraywing/textAngular/graphs/contributors
+
+## Develop
+1. Install nodejs >= 5.x
+   ```
+   curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+
+   ```
+
+2. run npm install, bower install
+3. run `sudo npm install grunt`
+4. run `grunt compile`

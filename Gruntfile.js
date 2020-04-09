@@ -179,6 +179,9 @@ module.exports = function (grunt) {
 			}
 		},
 		concat: {
+			options : {
+			  sourceMap :true
+		    },
 			dist: {
 				options: {
 					banner: "/*\n@license textAngular\nAuthor : Austin Anderson\nLicense : 2013 MIT\nVersion <%- pkg.version %>\n\nSee README.md or https://github.com/fraywing/textAngular/wiki for requirements and use.\n*/\n\n/*\nCommonjs package manager support (eg componentjs).\n*/\n\n\n\"use strict\";"
@@ -214,9 +217,13 @@ module.exports = function (grunt) {
 				mangle: true,
 				compress: {},
 				wrap: false,
-				preserveComments: 'some'
+				preserveComments: 'some',
+				sourceMap : true
 			},
 			my_target: {
+				options: {
+                    sourceMap: true
+                },
 				files: {
 					'dist/textAngular-rangy.min.js': ['bower_components/rangy/rangy-core.js', 'bower_components/rangy/rangy-selectionsaverestore.js'],
 					'dist/textAngular-sanitize.min.js': ['src/textAngular-sanitize.js'],
