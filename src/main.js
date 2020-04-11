@@ -14,10 +14,13 @@ textAngular.directive("textAngular", [
         textAngularManager, $document, $animate, $log, $q, $parse){
         return {
             require: '?ngModel',
-            scope: {},
+            scope: {
+                customButtons: '<?'
+            },
             restrict: "EA",
             priority: 2, // So we override validators correctly
             link: function(scope, element, attrs, ngModel){
+                console.log(scope.customButtons);
                 // all these vars should not be accessable outside this directive
                 var _keydown, _keyup, _keypress, _mouseup, _focusin, _focusout,
                     _originalContents, _editorFunctions,
@@ -438,6 +441,49 @@ textAngular.directive("textAngular", [
                         $document[0].execCommand(choice, false, null);
                     }
                 };
+
+                scope.reflowPopover = function(_el){
+                    var scrollTop = scope.getScrollTop(scope.displayElements.scrollWindow[0], false);
+                    var spaceAboveImage = _el[0].offsetTop-scrollTop.top;
+                    //var spaceBelowImage = scope.displayElements.text[0].offsetHeight - _el[0].offsetHeight - spaceAboveImage;
+                    //console.log(spaceAboveImage, spaceBelowImage);
+
+                    /* istanbul ignore if: catches only if near bottom of editor */
+                    if(spaceAboveImage < 51) {
+                        scope.displayElements.popover.css('top', _el[0].offsetTop + _el[0].offsetHeight + scope.displayElements.scrollWindow[0].scrollTop + 'px');
+                        scope.displayElements.popover.removeClass('top').addClass('bottom');
+                    } else {
+                        scope.displayElements.popover.css('top', _el[0].offsetTop - 54 + scope.displayElements.scrollWindow[0].scrollTop + 'px');
+                        scope.displayElements.popover.removeClass('bottom').addClass('top');
+                    }
+                    var _maxLeft = scope.displayElements.text[0].offsetWidth - scope.displayElements.popover[0].offsetWidth;
+                    var _targetLeft = _el[0].offsetLeft + (_el[0].offsetWidth / 2.0) - (scope.displayElements.popover[0].offsetWidth / 2.0);
+                    var _rleft = Math.max(0, Math.min(_maxLeft, _targetLeft));
+                    var _marginLeft = (Math.min(_targetLeft, (Math.max(0, _targetLeft - _maxLeft))) - 11);
+                    _rleft += window.scrollX;
+                    _marginLeft -= window.scrollX;
+                    scope.displayElements.popover.css('left', _rleft + 'px');
+                    scope.displayElements.popoverArrow.css('margin-left', _marginLeft + 'px');
+                };
+                scope.hidePopover = function(){
+                    scope.displayElements.popover.css('display', 'none');
+                    scope.displayElements.popoverContainer.attr('style', '');
+                    scope.displayElements.popoverContainer.attr('class', 'popover-content');
+                    scope.displayElements.popover.removeClass('in');
+                    scope.displayElements.resize.overlay.css('display', 'none');
+                };
+
+                // setup the resize overlay
+                scope.displayElements.resize.overlay.append(scope.displayElements.resize.background);
+                angular.forEach(scope.displayElements.resize.anchors, function(anchor){ scope.displayElements.resize.overlay.append(anchor);});
+                scope.displayElements.resize.overlay.append(scope.displayElements.resize.info);
+                scope.displayElements.scrollWindow.append(scope.displayElements.resize.overlay);
+
+                // A click event on the resize.background will now shift the focus to the editor
+                /* istanbul ignore next: click on the resize.background to focus back to editor */
+                scope.displayElements.resize.background.on('click', function(e) {
+                    scope.displayElements.text[0].focus();
+                });
                 // used in the toolbar actions
                 scope._actionRunning = false;
                 var _savedSelection = false;
