@@ -16,12 +16,16 @@ textAngular.directive("textAngular", [
             require: '?ngModel',
             scope: {
                 customButtons: '=?'
-                customButtons: '=?'
             },
             restrict: "EA",
             priority: 2, // So we override validators correctly
             link: function(scope, element, attrs, ngModel){
-                console.log(scope.customButtons);
+                var customButtonHeader = [];
+                for (var i = 0; i < scope.customButtons.length; i ++){
+                    customButtonHeader.push(scope.customButtons[i][0]);
+                }
+                taOptions.toolbar = taOptions.toolbar.concat([customButtonHeader]);
+                textAngularManager();
                 // all these vars should not be accessable outside this directive
                 var _keydown, _keyup, _keypress, _mouseup, _focusin, _focusout,
                     _originalContents, _editorFunctions,
