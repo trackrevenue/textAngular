@@ -9,9 +9,26 @@ textAngular.config([function(){
 
 textAngular.directive("textAngular", [
     '$compile', '$timeout', 'taOptions', 'taSelection', 'taExecCommand',
-    'textAngularManager', '$document', '$animate', '$log', '$q', '$parse',
+    'textAngularManager', '$document', '$animate', '$log', '$q', '$parse', 'taRegisterTool',
     function($compile, $timeout, taOptions, taSelection, taExecCommand,
-        textAngularManager, $document, $animate, $log, $q, $parse){
+        textAngularManager, $document, $animate, $log, $q, $parse, taRegisterTool){
+        function registerCustomButtons(customButtons) {
+            var customButtonHeader = [];
+            for (var i = 0; i < customButtons.length; i++) {
+                const button = customButtons[i];
+                textAngularManager.addTool(button.name,
+                    {
+                        iconclass: button.iconclass,
+                        tooltiptext: button.tooltiptext,
+                        action: function () {
+                            var embed = button.callback();
+                            return this.$editor().wrapSelection('insertHTML', embed, true);
+                        }
+                    });
+                customButtonHeader.push(button.name);
+            }
+            return customButtonHeader;
+        }
         return {
             require: '?ngModel',
             scope: {
@@ -20,12 +37,8 @@ textAngular.directive("textAngular", [
             restrict: "EA",
             priority: 2, // So we override validators correctly
             link: function(scope, element, attrs, ngModel){
-                var customButtonHeader = [];
-                for (var i = 0; i < scope.customButtons.length; i ++){
-                    customButtonHeader.push(scope.customButtons[i][0]);
-                }
+                var customButtonHeader = registerCustomButtons(scope.customButtons);
                 taOptions.toolbar = taOptions.toolbar.concat([customButtonHeader]);
-                textAngularManager();
                 // all these vars should not be accessable outside this directive
                 var _keydown, _keyup, _keypress, _mouseup, _focusin, _focusout,
                     _originalContents, _editorFunctions,
