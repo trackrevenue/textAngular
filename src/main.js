@@ -21,8 +21,15 @@ textAngular.directive("textAngular", [
                         iconclass: button.iconclass,
                         tooltiptext: button.tooltiptext,
                         action: function () {
-                            var embed = button.callback();
-                            return this.$editor().wrapSelection('insertHTML', embed, true);
+                            const _this = this;
+                            if (Promise.resolve(button.callback) === button.callback){
+                                button.callback().then((response) => {
+                                    _this.$editor().wrapSelection('insertHTML', response, true);
+                                });
+                            } else {
+                                var embed = button.callback();
+                                return _this.$editor().wrapSelection('insertHTML', embed, true);
+                            }
                         }
                     });
                 customButtonHeader.push(button.name);
