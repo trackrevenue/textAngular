@@ -291,12 +291,10 @@ angular.module('textAngular.factories', [])
         var deferred = $q.defer(),
             promise = deferred.promise,
             _editor = this.$editor();
-        console.log(_editor);
         // pass into the action the deferred function and also the function to reload the current selection if rangy available
         var result;
         try{
             result = this.action(deferred, _editor.startAction());
-            console.log(result);
             // We set the .finally callback here to make sure it doesn't get executed before any other .then callback.
             promise['finally'](function(){
                 _editor.endAction.call(_editor);

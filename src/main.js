@@ -9,9 +9,9 @@ textAngular.config([function(){
 
 textAngular.directive("textAngular", [
     '$compile', '$timeout', 'taOptions', 'taSelection', 'taExecCommand',
-    'textAngularManager', '$document', '$animate', '$log', '$q', '$parse', 'taRegisterTool',
+    'textAngularManager', '$document', '$animate', '$log', '$q', '$parse',
     function($compile, $timeout, taOptions, taSelection, taExecCommand,
-        textAngularManager, $document, $animate, $log, $q, $parse, taRegisterTool){
+        textAngularManager, $document, $animate, $log, $q, $parse){
         function registerCustomButtons(customButtons) {
             var customButtonHeader = [];
             for (var i = 0; i < customButtons.length; i++) {
@@ -19,10 +19,18 @@ textAngular.directive("textAngular", [
                 textAngularManager.addTool(button.name,
                     {
                         iconclass: button.iconclass,
+                        display: button.display,
                         tooltiptext: button.tooltiptext,
                         action: function () {
-                            var embed = button.callback();
-                            return this.$editor().wrapSelection('insertHTML', embed, true);
+                            const _this = this;
+                            const res = button.callback();
+                            if (Promise.resolve(res) === res) {
+                                res.then((response) => {
+                                    _this.$editor().wrapSelection('insertHTML', response, true);
+                                });
+                            } else {
+                                return _this.$editor().wrapSelection('insertHTML', res, true);
+                            }
                         }
                     });
                 customButtonHeader.push(button.name);
