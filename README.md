@@ -169,5 +169,6 @@ For a full list see: https://github.com/fraywing/textAngular/graphs/contributors
    ```
 
 2. run npm install, bower install
-3. run `sudo npm install grunt`
+3. run `sudo npm install grunt -g`
 4. run `grunt compile`
+5. open demo.html with a static server
