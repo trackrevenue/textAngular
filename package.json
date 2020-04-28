@@ -20,6 +20,7 @@
   "homepage": "http://textangular.com",
   "main": "./dist/textAngular.umd.js",
   "dependencies": {
+    "babel-preset-es2015": "^6.24.1",
     "rangy": "^1.3.0"
   },
   "browserDependencies": {
@@ -29,15 +30,19 @@
     "font-awesome": "^4.0.x"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
     "bower": "^1.3.3",
     "grunt": "^1.0.1",
+    "grunt-babel": "^7.0.0",
     "grunt-bump": "^0.8.0",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-jshint": "^1.0.0",
-    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-uglify": "^4.0.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-conventional-changelog": "^6.1.0",
     "grunt-git": "^1.0.0",
@@ -62,5 +67,10 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/fraywing/textAngular.git"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
   }
 }

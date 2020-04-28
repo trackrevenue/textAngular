@@ -6,6 +6,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-babel');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-istanbul-coverage');
 	grunt.loadNpmTasks('grunt-karma');
@@ -15,8 +16,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-git');
 	grunt.loadNpmTasks('grunt-shell');
 	grunt.loadNpmTasks('grunt-umd');
-
-	grunt.registerTask('compile', ['concat', 'umd', 'copy:setupFiles', 'jshint', 'uglify']);
+	grunt.registerTask('compile', ['concat', 'umd', 'copy:setupFiles', 'jshint', 'babel', 'uglify']);
 	grunt.registerTask('default', ['compile', 'test']);
 	grunt.registerTask('test', ['clean:coverage', 'jshint', 'karma', 'coverage']);
 	grunt.registerTask('travis-test', ['concat', 'umd', 'copy:setupFiles', 'jshint', 'karma', 'coverage', 'coveralls']);
@@ -26,7 +26,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('release:minor', ['bump-only:minor','setVersion','compile','demo_pages','conventionalChangelog','shell:changelog','gitcommit','bump-commit', 'shell:publish']);
 	grunt.registerTask('release:major', ['bump-only:major','setVersion','compile','demo_pages','conventionalChangelog','shell:changelog','gitcommit','bump-commit', 'shell:publish']);
 	grunt.registerTask('release:prerelease', ['bump-only:prerelease','setVersion','demo_pages','compile','conventionalChangelog','shell:changelog','gitcommit','bump-commit', 'shell:publish']);
-	
+
 	grunt.registerTask('setVersion', function () {
 		var pkgJson = require('./package.json');
 		var version = pkgJson.version;
@@ -167,6 +167,7 @@ module.exports = function (grunt) {
 				sub: true,
 				boss: true,
 				eqnull: true,
+				esversion: 6,
 				globals: {}
 			}
 		},
@@ -178,13 +179,31 @@ module.exports = function (grunt) {
 				dest: 'dist/'
 			}
 		},
-		concat: {
+        babel: {
+            options: {
+                sourceMap: true
+            },
+            dist: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'src/',
+                        src: ['*.js'],
+                        dest: 'dist/js-compiled/'
+                    }
+                ]
+            }
+        },
+        concat: {
+            options: {
+			  sourceMap :true
+		    },
 			dist: {
 				options: {
-					banner: "/*\n@license textAngular\nAuthor : Austin Anderson\nLicense : 2013 MIT\nVersion <%- pkg.version %>\n\nSee README.md or https://github.com/fraywing/textAngular/wiki for requirements and use.\n*/\n\n/*\nCommonjs package manager support (eg componentjs).\n*/\n\n\n\"use strict\";"
+					banner: "/*\n@license textAngular\nAuthor : Austin Anderson\nLicense : 2013 MIT\nVersion <%- pkg.version %>\n\nSee README.md or https://github.com/fraywing/textAngular/wiki for requirements and use.\n*/\n\n/*\nCommonjs package manager support (eg componentjs).\n*/\n\n\n\"use strict\";",
 				},
 				files:{
-					'dist/textAngular.js': ['src/globals.js','src/factories.js','src/DOM.js','src/validators.js','src/taBind.js','src/main.js'],
+					'dist/textAngular.js': ['src/globals.js','src/factories.js','src/DOM.js','src/validators.js','src/taBind.js','src/main.js']
 				}
 			},
 			umd: {
@@ -197,7 +216,7 @@ module.exports = function (grunt) {
 			all: {
 				options: {
 					src: 'dist/textAngular.umd.js',
-						dest: 'dist/textAngular.umd.js',
+					dest: 'dist/textAngular.umd.js',
 					objectToExport: 'textAngular.name',
 					globalAlias: 'textAngular',
 					amdModuleId: 'textAngular',
@@ -211,16 +230,18 @@ module.exports = function (grunt) {
 		},
 		uglify: {
 			options: {
-				mangle: true,
+				mangle: false,
 				compress: {},
 				wrap: false,
 				preserveComments: 'some'
 			},
 			my_target: {
+				options: {
+                    sourceMap: true,
+					sourceMapIn: 'dist/textAngular.js.map'
+                },
 				files: {
-					'dist/textAngular-rangy.min.js': ['bower_components/rangy/rangy-core.js', 'bower_components/rangy/rangy-selectionsaverestore.js'],
-					'dist/textAngular-sanitize.min.js': ['src/textAngular-sanitize.js'],
-					'dist/textAngular.min.js': ['dist/textAngular.umd.js']
+					'dist/textAngular.min.js': ['bower_components/rangy/rangy-core.js', 'bower_components/rangy/rangy-selectionsaverestore.js', 'dist/js-compiled/*.js', 'dist/dist/js-compiled/textAngular.umd.js'],
 				}
 			}
 		},

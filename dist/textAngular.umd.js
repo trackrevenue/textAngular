@@ -4,13 +4,13 @@
     define('textAngular', ["rangy","rangy/lib/rangy-selectionsaverestore"], function (a0,b1) {
       return (root['textAngular.name'] = factory(a0,b1));
     });
-  } else if (typeof exports === 'object') {
+  } else if (typeof module === 'object' && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
     module.exports = factory(require("rangy"),require("rangy/lib/rangy-selectionsaverestore"));
   } else {
-    root['textAngular'] = factory(rangy);
+    root['textAngular'] = factory(root["rangy"]);
   }
 }(this, function (rangy) {
 
@@ -3908,12 +3908,41 @@ textAngular.directive("textAngular", [
     'textAngularManager', '$document', '$animate', '$log', '$q', '$parse',
     function($compile, $timeout, taOptions, taSelection, taExecCommand,
         textAngularManager, $document, $animate, $log, $q, $parse){
+        function registerCustomButtons(customButtons) {
+            var customButtonHeader = [];
+            for (var i = 0; i < customButtons.length; i++) {
+                const button = customButtons[i];
+                textAngularManager.addTool(button.name,
+                    {
+                        iconclass: button.iconclass,
+                        display: button.display,
+                        tooltiptext: button.tooltiptext,
+                        action: function () {
+                            const _this = this;
+                            const res = button.callback();
+                            if (Promise.resolve(res) === res) {
+                                res.then((response) => {
+                                    _this.$editor().wrapSelection('insertHTML', response, true);
+                                });
+                            } else {
+                                return _this.$editor().wrapSelection('insertHTML', res, true);
+                            }
+                        }
+                    });
+                customButtonHeader.push(button.name);
+            }
+            return customButtonHeader;
+        }
         return {
             require: '?ngModel',
-            scope: {},
+            scope: {
+                customButtons: '=?'
+            },
             restrict: "EA",
             priority: 2, // So we override validators correctly
             link: function(scope, element, attrs, ngModel){
+                var customButtonHeader = registerCustomButtons(scope.customButtons);
+                taOptions.toolbar = taOptions.toolbar.concat([customButtonHeader]);
                 // all these vars should not be accessable outside this directive
                 var _keydown, _keyup, _keypress, _mouseup, _focusin, _focusout,
                     _originalContents, _editorFunctions,
@@ -4334,6 +4363,7 @@ textAngular.directive("textAngular", [
                         $document[0].execCommand(choice, false, null);
                     }
                 };
+
                 // used in the toolbar actions
                 scope._actionRunning = false;
                 var _savedSelection = false;
@@ -5309,6 +5339,7 @@ textAngular.directive('textAngularVersion', ['textAngularManager',
     }
 ]);
 
+//# sourceMappingURL=textAngular.umd.js.map
 return textAngular.name;
 
 }));
