@@ -241,7 +241,9 @@ module.exports = function (grunt) {
 					sourceMapIn: 'dist/textAngular.js.map'
                 },
 				files: {
-					'dist/textAngular.min.js': ['bower_components/rangy/rangy-core.js', 'bower_components/rangy/rangy-selectionsaverestore.js', 'dist/js-compiled/*.js', 'dist/dist/js-compiled/textAngular.umd.js'],
+					'dist/textAngular-rangy.min.js': ['bower_components/rangy/rangy-core.js', 'bower_components/rangy/rangy-selectionsaverestore.js'],
+					'dist/textAngular-sanitize.min.js': ['src/textAngular-sanitize.js'],
+					'dist/textAngular.min.js': ['dist/js-compiled/*.js']
 				}
 			}
 		},
